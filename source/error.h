@@ -3,6 +3,24 @@
 
 #include "common.h"
 
+enum ExceptionType {
+    WindowException,
+    GLFWException,
+    GameException,
+    ShaderException,
+    TextureException
+};
+
+class Exception {
+public:
+    Exception(const char* name, ExceptionType type, const char* msg, int code = -1);
+private:
+    const char* name;
+    ExceptionType type;
+    const char* msg;
+    int code;
+};
+
 template<typename U>
 void errorLog(const U& Message) {
     std::cerr << Message << std::endl;

@@ -3,6 +3,7 @@
 
 // Common
 #include <iostream>
+#include <algorithm>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
@@ -30,5 +31,7 @@ extern const char* operatingSystemType;
 extern std::string projectPath;
 std::string currentOSPath(const char* windowsRelativePath, const char* UnixRelativePath);
 
+#define EXIT_SUCCESS 0;
+#define EXIT_FAILURE -1;
 
 #endif

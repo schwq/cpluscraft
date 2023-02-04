@@ -1,13 +1,19 @@
 #ifndef _SHADER_H_
 #define _SHADER_H_
 
-#include "common.h"
-#include "error.h"
+#include "../common.h"
+#include "../error.h"
 
 class Shader {
 public:
 	Shader(const char* vertexSource, const char* fragmentSource, const char* shaderName);
-	~Shader();
+	Shader();
+	
+	Shader& operator=(const Shader &shader) {
+		Shader returnShader;
+		returnShader.shaderProgramID = shader.shaderProgramID;
+	}
+	
 	void useShader();
 	unsigned int getID();
 	void setInt(const std::string& name, int value);

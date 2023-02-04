@@ -95,10 +95,6 @@ void Shader::useShader() {
 	glUseProgram(shaderProgramID);
 }
 
-Shader::~Shader() {
-	msgLog("Deleting Shader");
-}
-
 unsigned int Shader::getID() {
 	return shaderProgramID;
 }

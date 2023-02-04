@@ -1,8 +1,8 @@
 #ifndef _MODEL_H_
 #define _MODEL_H_
 
-#include "error.h"
-#include "common.h"
+#include "../error.h"
+#include "../common.h"
 #include "mesh.h"
 
 class Model {

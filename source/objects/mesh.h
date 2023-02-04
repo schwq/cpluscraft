@@ -1,8 +1,8 @@
 #ifndef _MESH_H_
 #define _MESH_H_
 
-#include "common.h"
-#include "error.h"
+#include "../common.h"
+#include "../error.h"
 #include "shader.h"
 
 struct Vertex {

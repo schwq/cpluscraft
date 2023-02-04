@@ -1,5 +1,5 @@
 #include "model.h"
-#include "libs/stb_image.h"
+#include "../libs/stb_image.h"
 
 unsigned int TextureFromFile(std::string path);
 
@@ -110,7 +110,13 @@ std::vector<TextureInfo> Model::loadMaterialTexture(aiMaterial* mat, aiTextureTy
 
 unsigned int TextureFromFile(std::string path) {
 
-	std::string result = (currentOSPath("\\source\\models", "hel") + path);
+#ifdef defined(_WIN32) || defined(__CYGWIN__)  
+
+	std::replace(path.begin(), path.end(), '/', '\\');
+
+#endif
+	stbi_set_flip_vertically_on_load(true);
+	std::string result = (currentOSPath("\\source\\resources\\models", "/resources/models") + path);
 
 	unsigned int textureID;
 	glGenTextures(1, &textureID);

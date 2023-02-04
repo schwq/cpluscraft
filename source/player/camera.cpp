@@ -69,3 +69,18 @@ glm::vec3 Camera::getPosition() {
 glm::vec3 Camera::getDirection() {
 	return this->cameraFront;
 }
+
+void Camera::mouseCallback(bool& firstMouse, float& lastX, float& lastY, double xpos, double ypos) {
+	if (firstMouse) {
+		lastX = static_cast<float>(xpos);
+		lastY = static_cast<float>(ypos);
+		firstMouse = false;
+	}
+
+	float yoffset = lastY - static_cast<float>(ypos);
+	float xoffset = static_cast<float>(xpos) - lastX;
+	lastX = static_cast<float>(xpos);
+	lastY = static_cast<float>(ypos);
+
+	updateDirection(xoffset, yoffset);
+}

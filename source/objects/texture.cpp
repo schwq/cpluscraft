@@ -1,11 +1,13 @@
 #include "texture.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "libs/stb_image.h"
+#include "../libs/stb_image.h"
 
 Texture::Texture(const char* texturePath, unsigned int format) {
-
 	stbi_set_flip_vertically_on_load(true);
+
+	if(texturePath = "none") { return; }
+
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -41,8 +43,6 @@ void Texture::defaultConfiguration() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
-
-Texture::~Texture() {}
 
 unsigned int Texture::getID() {
 	return textureID;

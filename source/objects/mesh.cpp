@@ -13,7 +13,7 @@ void Mesh::setupMesh() {
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VAO);/-
+	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
@@ -37,6 +37,8 @@ void Mesh::draw(Shader& shader) {
 	unsigned int diffuseNumber = 1;
 	unsigned int specularNumber = 1;
 	
+	shader.useShader();
+
 	for (unsigned int x = 0; x < textures.size(); x++) {
 		glActiveTexture(GL_TEXTURE0 + x);
 		std::string number;
@@ -47,7 +49,6 @@ void Mesh::draw(Shader& shader) {
 		else if (name == "texture_specular") {
 			number = std::to_string(specularNumber++);
 		}
-		msgLog("material." + name + number);
 		shader.setInt(("material." + name + number).c_str(), x);
 		glBindTexture(GL_TEXTURE_2D, textures[x].id);
 	}
