@@ -14,6 +14,10 @@ void Camera::updateSpeed(float speed) {
 	cameraSpeed = speed;
 }
 
+glm::mat4 Camera::returnViewMatrix() {
+	return glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);
+}
+
 void Camera::update(Shader& shader) {
 	glm::mat4 view = glm::mat4(1.0f);
 	view = glm::lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp);

@@ -1,5 +1,10 @@
 #include "window.h"
 
+Window* Window::get(GLFWwindow*&window, const char* windowTitle, int width, int height) {
+	static Window* ptr_Window = new Window(window, windowTitle, width, height);
+	return ptr_Window;
+}
+
 Window::Window(GLFWwindow*& window, const char* windowTitle, int width, int heigth) : window(window), windowTitle(windowTitle) {
     glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -13,13 +18,13 @@ Window::Window(GLFWwindow*& window, const char* windowTitle, int width, int heig
 	this->window = glfwCreateWindow(width, heigth, this->windowTitle, NULL, NULL);
 
     if (window == NULL) {
-		errorLog("Error: Cannot create GLFW window!");
+		logError("Error: Cannot create GLFW window!");
 		glfwTerminate();
 	}
 }
 
 void Window::checkGLAD() {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        errorLog("Error: Cannot load GLAD!");
+        logError("Error: Cannot load GLAD!");
     }
 }

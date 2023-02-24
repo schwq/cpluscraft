@@ -3,21 +3,24 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../libs/stb_image.h"
 
-Texture::Texture(const char* texturePath, unsigned int format) {
-	stbi_set_flip_vertically_on_load(true);
+unsigned int Texture::textureCount = 0;
 
-	if(texturePath = "none") { return; }
+Texture::Texture(const char* texturePath,std::string name, unsigned int format) : name(name) {
+	stbi_set_flip_vertically_on_load(true);
 
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	defaultConfiguration();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, channels;
 	unsigned char* data = stbi_load(texturePath, &width, &height, &channels, 0);
 
 	if (data) {
-		GLenum format = GL_RGB;
+
 		if (channels == 1) {
 			format = GL_RED;
 		}
@@ -27,23 +30,56 @@ Texture::Texture(const char* texturePath, unsigned int format) {
 		else if (channels == 4) {
 			format = GL_RGBA;
 		}
-
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_INT, data);
+	
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+
+
+		logMessage("Success: Texture ", name, textureCount ," Compilated created with success! ID: ", getID());
+		textureCount++;
 	}
 	else {
-		errorLog("Error: Cannot create texture!", texturePath);
+		logError("Error: Cannot create texture", name , textureCount,"! Path: " , texturePath);
 	}
 	stbi_image_free(data);
 }
 
-void Texture::defaultConfiguration() {
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+Texture::Texture(std::vector<std::string> paths, std::string name, unsigned int format) : name(name) {
+	stbi_set_flip_vertically_on_load(false);
+
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	int width, height, channels;
+	unsigned char* data = nullptr;
+	for(unsigned int x = 0; x < paths.size(); x++) {
+		const char* temp_path = paths.at(x).c_str();
+		data  = stbi_load(temp_path, &width, &height, &channels, 0);
+		if(data) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + x, 
+                         0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+           
+			logMessage("Success: CubeMap ", name, textureCount, " loaded successfully! ID: ", getID());
+			textureCount++;
+		} else {
+			logError("Error: Cannot load cubemap ", name, textureCount, " at path: ", paths[x]);
+		}
+	}
+	if(data != nullptr) {
+		stbi_image_free(data);
+	}
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-unsigned int Texture::getID() {
+GLuint Texture::getID() {
 	return textureID;
 }
+

@@ -6,13 +6,25 @@
 
 class Texture {
 public:
-	Texture(const char* texturePath, unsigned int format = GL_RGB);
-	Texture() = default;
-	void defaultConfiguration();
-	unsigned int getID();
-private:
-	unsigned int textureID;
+	Texture(const char* texturePath, std::string name  = "texture", unsigned int format = GL_RGB);
+	Texture(std::vector<std::string> paths, std::string name = "texture", unsigned int format = GL_RGB);
+	Texture();
+	
+	Texture& operator=(Texture& tex) {
+		if(this == &tex) {
+			return *this;
+		} else {
+			this->textureID = tex.textureID;
+			return *this;
+		}
+	}
 
+	GLuint getID();
+private:
+	GLuint textureID;
+	static unsigned int textureCount;
+	std::string name;
+	
 };
 
 #endif

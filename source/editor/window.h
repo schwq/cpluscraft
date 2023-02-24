@@ -6,14 +6,16 @@
 
 class Window {
 public:
-    Window(GLFWwindow*&window, const char* windowTitle, int width, int height);
+    static Window* get(GLFWwindow*&window, const char* windowTitle, int width, int height);
+    void checkGLAD();
     GLFWwindow* returnWindow() {
         return window;
     }
-    void checkGLAD();
 private:
     GLFWwindow*& window;
     const char* windowTitle;
+    Window(GLFWwindow*&window, const char* windowTitle, int width, int height);
+    
 };
 
 #endif

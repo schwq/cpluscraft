@@ -3,44 +3,26 @@
 
 #include "common.h"
 
-enum ExceptionType {
-    WindowException,
-    GLFWException,
-    GameException,
-    ShaderException,
-    TextureException
-};
-
-class Exception {
-public:
-    Exception(const char* name, ExceptionType type, const char* msg, int code = -1);
-private:
-    const char* name;
-    ExceptionType type;
-    const char* msg;
-    int code;
-};
-
 template<typename U>
-void errorLog(const U& Message) {
+void logError(const U& Message) {
     std::cerr << Message << std::endl;
 }
 
 template<typename T, typename... Y>
-void errorLog(const T& Message, const Y&... Error) {
+void logError(const T& Message, const Y&... Error) {
     std::cerr << Message;
-    errorLog(Error...);
+    logError(Error...);
 }
 
 template<typename U>
-void msgLog(const U& Message) {
+void logMessage(const U& Message) {
     std::cout << Message << std::endl;
 }
 
 template<typename T, typename... Y>
-void msgLog(const T& Message, const Y&... Rest) {
+void logMessage(const T& Message, const Y&... Rest) {
     std::cout << Message;
-    msgLog(Rest...);
+    logMessage(Rest...);
 }
 
 #endif

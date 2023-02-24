@@ -1,5 +1,9 @@
 #include "shader.h"
 
+Shader::~Shader() {
+	glDeleteProgram(shaderProgramID);
+}
+
 Shader::Shader(const char* vertexSource, const char* fragmentSource, const char* shaderName) {
 
 	unsigned int vertexShaderSource = 0;
@@ -10,7 +14,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 	if (vertexFile.is_open()) {
 		
 		auto vertexFileSize = vertexFile.tellg();
-		msgLog("Info: ", shaderName, " vertex shader file size: ", vertexFileSize);
+		logMessage("Info: ", shaderName, " vertex shader file size: ", vertexFileSize);
 		vertexFile.seekg(std::ios::beg);
 		std::string vertexContent(vertexFileSize, 0);
 		vertexFile.read(&vertexContent[0], vertexFileSize);
@@ -24,16 +28,16 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 		
 		if (!vertexShaderSuccess) {
 			glGetShaderInfoLog(vertexShaderSource, 512, NULL, vertexInfoLog);
-			errorLog("Error: ", shaderName, " vertex shader compilation failed!, ", vertexInfoLog);
+			logError("Error: ", shaderName, " vertex shader compilation failed!, ", vertexInfoLog);
 		}
 		else {
-			msgLog("Success: ", shaderName, " vertex shader compilation succeeded!");
+			logMessage("Success: ", shaderName, " vertex shader compilation succeeded!");
 		}
 
 		vertexFile.close();
 	}
 	else {
-		errorLog("Error: Cannot read ", shaderName, " vertex shader file!");
+		logError("Error: Cannot read ", shaderName, " vertex shader file!");
 	}
 
 	unsigned int fragmentShaderSource = 0;
@@ -44,7 +48,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 	if (fragmentFile.is_open()) {
 
 		auto fragmentFileSize = fragmentFile.tellg();
-		msgLog("Info: ", shaderName, " fragment shader file size: ", fragmentFileSize);
+		logMessage("Info: ", shaderName, " fragment shader file size: ", fragmentFileSize);
 		fragmentFile.seekg(std::ios::beg);
 		std::string fragmentContent(fragmentFileSize, 0);
 		fragmentFile.read(&fragmentContent[0], fragmentFileSize);
@@ -58,16 +62,16 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 
 		if (!fragmentShaderSuccess) {
 			glGetShaderInfoLog(fragmentShaderSource, 512, NULL, fragmentInfoLog);
-			errorLog("Error: ", shaderName, " fragment shader compilation failed! ", fragmentInfoLog);
+			logError("Error: ", shaderName, " fragment shader compilation failed! ", fragmentInfoLog);
 		}
 		else {
-			msgLog("Success: ", shaderName, " fragment shader compilation succeeded!");
+			logMessage("Success: ", shaderName, " fragment shader compilation succeeded!");
 		}
 
 		fragmentFile.close();
 	}
 	else {
-		errorLog("Error: Cannot read ", shaderName, " fragment shader file!");
+		logError("Error: Cannot read ", shaderName, " fragment shader file!");
 	}
 
 	shaderProgramID = glCreateProgram();
@@ -81,21 +85,82 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource, const char*
 	glGetProgramiv(shaderProgramID, GL_LINK_STATUS, &linkingSuccess);
 	if (!linkingSuccess) {
 		glGetProgramInfoLog(shaderProgramID, 512, NULL, linkingInfoLog);
-		errorLog("Error: ", shaderName, " linking failed! ", linkingInfoLog);
+		logError("Error: ", shaderName, " linking failed! ", linkingInfoLog);
 	}
 	else {
-		msgLog("Success: ", shaderName, " linking succeeded!");
+		logMessage("Success: ", shaderName, " linking succeeded!");
 	}
 
 	glDeleteShader(vertexShaderSource);
 	glDeleteShader(fragmentShaderSource);
 }
 
+void Shader::manifestShaderProperties(Camera& camera) {
+
+	setVec3("source_dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+	setVec3("source_dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+	setVec3("source_dirLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+	setVec3("source_dirLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+	
+	// point light 1
+	setVec3("source_ptrLight[0].position", pointLightPositions[0]);
+	setVec3("source_ptrLight[0].ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+	setVec3("source_ptrLight[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+	setVec3("source_ptrLight[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	setFloat("source_ptrLight[0].constant", 1.0f);
+	setFloat("source_ptrLight[0].linear", 0.09f);
+	setFloat("source_ptrLight[0].quadratic", 0.032f);
+	// point light 2
+	setVec3("source_ptrLight[1].position", pointLightPositions[1]);
+	setVec3("source_ptrLight[1].ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+	setVec3("source_ptrLight[1].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+	setVec3("source_ptrLight[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	setFloat("source_ptrLight[1].constant", 1.0f);
+	setFloat("source_ptrLight[1].linear", 0.09f);
+	setFloat("source_ptrLight[1].quadratic", 0.032f);
+	// point light 3
+	setVec3("source_ptrLight[2].position", pointLightPositions[2]);
+	setVec3("source_ptrLight[2].ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+	setVec3("source_ptrLight[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+	setVec3("source_ptrLight[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	setFloat("source_ptrLight[2].constant", 1.0f);
+	setFloat("source_ptrLight[2].linear", 0.09f);
+	setFloat("source_ptrLight[2].quadratic", 0.032f);
+	// point light 4
+	setVec3("source_ptrLight[3].position", pointLightPositions[3]);
+	setVec3("source_ptrLight[3].ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+	setVec3("source_ptrLight[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+	setVec3("source_ptrLight[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	setFloat("source_ptrLight[3].constant", 1.0f);
+	setFloat("source_ptrLight[3].linear", 0.09f);
+	setFloat("source_ptrLight[3].quadratic", 0.032f);
+	
+	// source_sptLight
+	setVec3("source_sptLight.position", camera.getPosition());
+	setVec3("source_sptLight.direction", camera.getDirection());
+	setVec3("source_sptLight.ambient", glm::vec3(0.3f, 0.3f, 0.3f));
+	setVec3("source_sptLight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+	setVec3("source_sptLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	setFloat("source_sptLight.constant", 1.0f);
+	setFloat("source_sptLight.linear", 0.09f);
+	setFloat("source_sptLight.quadratic", 0.032f);
+	setFloat("source_sptLight.cutOff", glm::cos(glm::radians(12.5f)));
+	setFloat("source_sptLight.outerCutOff", glm::cos(glm::radians(15.0f)));
+	
+	setVec3("source_cbLight.position", glm::vec3(1.0f)); 
+	setVec3("source_cbLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+	setVec3("source_cbLight.diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+	setVec3("source_cbLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	setFloat("source_cbLight.constant", 1.0f);
+	setFloat("source_cbLight.linear", 0.09f);
+	setFloat("source_cbLight.quadratic", 0.032f);
+}
+
 void Shader::useShader() {
 	glUseProgram(shaderProgramID);
 }
 
-unsigned int Shader::getID() {
+GLuint Shader::getID() {
 	return shaderProgramID;
 }
 

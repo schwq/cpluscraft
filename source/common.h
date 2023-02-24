@@ -17,6 +17,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 // Assimp model importing
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -29,9 +30,13 @@
 // Globals
 extern const char* operatingSystemType;
 extern std::string projectPath;
-std::string currentOSPath(const char* windowsRelativePath, const char* UnixRelativePath);
+extern std::string currentOSPath(const char* windowsRelativePath, const char* UnixRelativePath);
+extern std::string searchShader(std::string shaderName);
+extern std::string searchTexture(std::string textureName); 
+extern std::string searchModel(std::string modelName); 
+extern std::string searchMusic(std::string musicName);
 
-#define EXIT_SUCCESS 0;
-#define EXIT_FAILURE -1;
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE -1
 
 #endif

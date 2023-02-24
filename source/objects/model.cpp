@@ -5,21 +5,66 @@ unsigned int TextureFromFile(std::string path);
 
 void Model::draw(Shader& shader) {
 
+	this->model = glm::translate(this->model, position);
+    
+    if(Xrotation != 0.0f) {
+        this->model = glm::rotate(this->model, glm::radians(this->Xrotation), glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+    if(Yrotation != 0.0f) {
+        this->model = glm::rotate(this->model, glm::radians(this->Yrotation), glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+    if(Zrotation != 0.0f) {
+        this->model = glm::rotate(this->model, glm::radians(this->Zrotation), glm::vec3(0.0f, 0.0f, 1.0f));
+    }
+    
+    this->model = glm::scale(this->model, scaling);
+    
+    
+    shader.setMat4("model", this->model);
+
 	for (unsigned int x = 0; x < meshes.size(); x++) {
 		meshes[x].draw(shader);
 	}
+
+	 this->model = glm::mat4(1.0f);
+
 }
 
 void Model::loadModel(std::string path) {
 	Assimp::Importer imp;
 	const aiScene* scene = imp.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		errorLog("Error: Assimp: ", imp.GetErrorString());
+		logError("Error: Assimp: ", imp.GetErrorString());
 		return;
 	}
-	
-	msgLog(path);
 	processNode(scene->mRootNode, scene);
+}
+
+void Model::translate(glm::vec3 positionVec) {
+    position = positionVec;
+}
+
+void Model::scale(glm::vec3 scaleVec) {
+    scaling = scaleVec;
+}
+
+void Model::rotate(RotationAxis axis, float fator) {
+    switch(axis) {
+        case Xaxis:
+            Xrotation = fator;
+            //this->model = glm::rotate(this->model, glm::radians(fator), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case Yaxis:
+            Yrotation = fator;
+            //this->model = glm::rotate(this->model, glm::radians(fator), glm::vec3(0.0f, 1.0f, 0.0f));
+            break;
+        case Zaxis:
+            Zrotation = fator;
+            //this->model = glm::rotate(this->model, glm::radians(fator), glm::vec3(0.0f, 0.0f, 1.0f));
+            break;
+        default:
+            logError("Warning: Shapes rotate without axis declared!");
+    }
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene) {
@@ -118,8 +163,14 @@ unsigned int TextureFromFile(std::string path) {
 	stbi_set_flip_vertically_on_load(true);
 	std::string result = (currentOSPath("\\source\\resources\\models", "/resources/models") + path);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	int width, height, nrComponents;
 	unsigned char* data = stbi_load(result.c_str(), &width, &height, &nrComponents, 0);
@@ -137,22 +188,14 @@ unsigned int TextureFromFile(std::string path) {
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		std::cout << "Texture success to load at path: " << path << std::endl;
-		std::cout << "Texture success to load at result: " << result << std::endl;
-
+		logMessage("Success! Texture created with success! ID: ", textureID);
 		stbi_image_free(data);
 	}
 	else
 	{
-		std::cout << "Texture failed to load at path: " << path << std::endl;
-		std::cout << "Texture failed to load at result: " << result << std::endl;
+		
 		stbi_image_free(data);
 	}
-
+	glBindTexture(GL_TEXTURE_2D, NULL);
 	return textureID;
 }

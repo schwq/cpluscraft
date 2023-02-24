@@ -5,6 +5,8 @@
 #include "../error.h"
 #include "../objects/shader.h"
 
+class Shader;
+
 enum CameraPos {
 	Camera_Forward,
 	Camera_Backward,
@@ -30,6 +32,7 @@ public:
 	void updateSpeed(float speed);
 	void update(Shader& shader);
 	void mouseCallback(bool& firstMouse, float& lastX, float& lastY, double xpos, double ypos);
+	glm::mat4 returnViewMatrix();
 	glm::vec3 getPosition();
 	glm::vec3 getDirection();
 
