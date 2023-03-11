@@ -1,0 +1,3 @@
+/home/schwqq/repos/cpluscraft/build/CMakeFiles/cpluscraft.dir
+/home/schwqq/repos/cpluscraft/build/CMakeFiles/edit_cache.dir
+/home/schwqq/repos/cpluscraft/build/CMakeFiles/rebuild_cache.dir
